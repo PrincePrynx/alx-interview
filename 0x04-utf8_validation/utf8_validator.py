@@ -5,36 +5,25 @@ UTF-8 Validation
 
 def validUTF8(data):
     """
-    Validate if a given data set represents a valid UTF-8 encoding.
-    
-    :param data: List of integers
-    :return: True if data is a valid UTF-8 encoding, else False
+    data: a list of integers
+    Return: True if data is a valid UTF-8
+    encoding, else return False
     """
-    n_bytes = 0
+    byte_count = 0  # Number of bytes in the current UTF-8 character
 
-    for num in data:
-        byte = num & 0xFF  # Get the last 8 bits
-
-        if n_bytes == 0:
-            # Count the number of leading 1's
-            if (byte >> 5) == 0b110:
-                n_bytes = 1
-            elif (byte >> 4) == 0b1110:
-                n_bytes = 2
-            elif (byte >> 3) == 0b11110:
-                n_bytes = 3
-            elif (byte >> 7) != 0:
+    for i in data:
+        if byte_count == 0:  # If we are not in the middle of processing a UTF-8 character
+            if i >> 5 == 0b110:  # 2-byte character (starts with 110xxxxx)
+                byte_count = 1
+            elif i >> 4 == 0b1110:  # 3-byte character (starts with 1110xxxx)
+                byte_count = 2
+            elif i >> 3 == 0b11110:  # 4-byte character (starts with 11110xxx)
+                byte_count = 3
+            elif i >> 7 == 0b1:  # Invalid single byte (starts with 1xxxxxxx)
                 return False
-        else:
-            if (byte >> 6) != 0b10:
+        else:  # We are in the middle of processing a UTF-8 character
+            if i >> 6 != 0b10:  # Continuation bytes must start with 10xxxxxx
                 return False
-        n_bytes -= 1
+            byte_count -= 1  # One less byte to process for the current character
 
-    return n_bytes == 0
-
-if __name__ == "__main__":
-    import sys
-    import os
-    # Basic usage and testing
-    print(validUTF8([197, 130, 1]))  # True
-    print(validUTF8([235, 140, 4]))  # False
+    return byte_count == 0  # All characters should be completely processed
