@@ -1,23 +1,15 @@
 #!/usr/bin/python3
 """
-Main script to test UTF-8 validation
+Main file for testing
 """
 
-from utf8_validator import validUTF8
+validUTF8 = __import__('0-validate_utf8').validUTF8
 
-def main():
-    test_cases = [
-        ([197, 130, 1], True),
-        ([235, 140, 4], False),
-        ([240, 162, 138, 147], True),
-        ([145], False),
-        ([0], True),
-        ([248, 130, 130, 130], False)
-    ]
+data = [65]
+print(validUTF8(data))
 
-    for i, (data, expected) in enumerate(test_cases):
-        result = validUTF8(data)
-        print(f"Test case {i+1}: {'Passed' if result == expected else 'Failed'}")
+data = [80, 121, 116, 104, 111, 110, 32, 105, 115, 32, 99, 111, 111, 108, 33]
+print(validUTF8(data))
 
-if __name__ == "__main__":
-    main()
+data = [229, 65, 127, 256]
+print(validUTF8(data))
